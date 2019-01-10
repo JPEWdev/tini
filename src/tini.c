@@ -658,8 +658,17 @@ int reap_zombies(const pid_t child_pid, int* const child_exitcode_ptr, bool chec
 							*child_exitcode_ptr = 0;
 						}
 					}
-				} else if (warn_on_reap > 0) {
-					PRINT_WARNING("Reaped zombie process with pid=%i", current_pid);
+				} else {
+					if (warn_on_reap > 0)
+						PRINT_WARNING("Reaped zombie process with pid=%i", current_pid);
+
+					if (WIFEXITED(current_status)) {
+						PRINT_DEBUG("pid %i exited normally (with status '%i')", current_pid, WEXITSTATUS(current_status));
+					} else if (WIFSIGNALED(current_status)) {
+						PRINT_DEBUG("pid %i exited with signal (with signal '%s')", current_pid, strsignal(WTERMSIG(current_status)));
+					} else {
+						PRINT_DEBUG("pid %i exited for unknown reason", current_pid);
+					}
 				}
 
 				// Check if other childs have been reaped.
