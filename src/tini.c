@@ -599,6 +599,11 @@ int wait_and_forward_signal(sigset_t const* const parent_sigset_ptr, pid_t const
 						return 1;
 					}
 				}
+
+				if (sig.si_signo == SIGTSTP) {
+					PRINT_DEBUG("Suspending self due to '%s'", strsignal(sig.si_signo));
+					kill(getpid(), SIGSTOP);
+				}
 				break;
 		}
 	}
